@@ -32,9 +32,11 @@ def create_app(config_class=Config):
     from iblog.users.routes import users
     from iblog.posts.routes import posts
     from iblog.main.routes import main
+    from iblog.errors.handlers import errors
     app.register_blueprint(users)
     app.register_blueprint(posts)
     app.register_blueprint(main)
+    app.register_blueprint(errors)
 
     return app
 
