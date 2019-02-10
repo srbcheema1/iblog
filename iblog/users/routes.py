@@ -8,6 +8,7 @@ from iblog.models import User, Post
 from iblog.users.forms import RegistrationForm, LoginForm, UpdateAccountForm
 from iblog.users.forms import RequestResetForm, ResetPasswordForm
 from iblog.users.utils import save_picture, send_reset_email
+from iblog.utils import prefix
 
 users = Blueprint('users', __name__)
 
@@ -88,7 +89,7 @@ def user_posts(username):
     posts = Post.query.filter_by(author=user)\
         .order_by(Post.date_posted.desc())\
         .paginate(page=page, per_page=3)
-    return render_template('user_posts.html', posts=posts, user=user)
+    return render_template('user_posts.html', posts=posts, user=user,prefix=prefix)
 
 
 @users.route("/reset_password", methods=['GET', 'POST'])
