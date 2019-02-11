@@ -7,6 +7,7 @@ from PIL import Image
 from urllib.request import urlopen
 
 from iblog.config import mail
+from iblog.models import User
 
 def get_unique_username(uname):
     temp_uname = uname
