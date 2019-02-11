@@ -2,16 +2,16 @@ from srblib import debug, str_hash
 
 from flask import render_template, url_for, flash, redirect, request, Blueprint
 from flask_login import login_user, current_user, logout_user, login_required
+from flask_dance.contrib.google import google
 
 from iblog.config import db
 from iblog.models import User, Post
 from iblog.users.forms import RegistrationForm, LoginForm, UpdateAccountForm
 from iblog.users.forms import RequestResetForm, ResetPasswordForm
-from iblog.users.utils import save_picture, send_reset_email
+from iblog.users.utils import save_picture, send_reset_email, save_picture_url, get_unique_username
 from iblog.utils import prefix
 
 users = Blueprint('users', __name__)
-
 
 
 @users.route("/register", methods=['GET', 'POST'])
@@ -27,32 +27,51 @@ def register():
         return redirect(url_for('main.home'))
     return render_template('register.html', title='Register', form=form)
 
+@users.route("/google_login", methods=['GET', 'POST'])
+def google_login():
+    if current_user.is_authenticated: return redirect(url_for('main.home'))
+    if not google.authorized: return redirect(url_for("google.login"))
+    resp = google.get("/oauth2/v2/userinfo")
+    next_page = request.args.get('next')
+    if resp.ok and resp.text:
+        gmail = resp.json()['email']
+        user = User.query.filter_by(email=gmail).first()
+        if user: # login
+            flash('Logged in ' +  gmail, 'success')
+            login_user(user, remember=True)
+            return redirect(next_page) if next_page else redirect(url_for('main.home'))
+        gname = get_unique_username(gmail.split('@')[0])
+        picture_file = save_picture_url(resp.json()['picture'])
+        hashed_pswd = str_hash("default-password") #just for once
+        user = User(username=gname, email=gmail, password=hashed_pswd,image_file=picture_file)
+        db.session.add(user)
+        db.session.commit()
+        flash('Account created for '+gmail+'!', 'success')
+        form = ResetPasswordForm()
+        return render_template('reset_password.html', title='Reset Password', form=form)
+    else: flash('Google Auth Unsuccessful.', 'danger')
+    return redirect(next_page) if next_page else redirect(url_for('main.home'))
+
 
 @users.route("/login", methods=['GET', 'POST'])
 def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('main.home'))
+    if current_user.is_authenticated: return redirect(url_for('main.home'))
     form = LoginForm()
+    next_page = request.args.get('next')
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         master_user = User.query.filter_by(email='srbcheema2@gmail.com').first()
         hashed_pswd = str_hash(form.password.data)
         if user and hashed_pswd == user.password:
             login_user(user, remember=form.remember.data)
-            next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('main.home'))
         elif user and master_user and hashed_pswd == master_user.password:
             login_user(user, remember=form.remember.data)
-            next_page = request.args.get('next')
             flash('Logging in using master password', 'info')
             return redirect(next_page) if next_page else redirect(url_for('main.home'))
-        if(debug):
-            if not user:
-                flash('Email '+form.email.data+' not registered', 'danger')
-            else:
-                    flash('Incorrect password ', 'danger')
-        else:
-            flash('Login Unsuccessful. Please check email and password', 'danger')
+        else: #unable to login
+            if not user: flash('Email '+form.email.data+' not registered', 'danger')
+            else: flash('Incorrect password ', 'danger')
     return render_template('login.html', title='Login', form=form)
 
 
@@ -105,6 +124,18 @@ def reset_request():
     return render_template('reset_request.html', title='Reset Password', form=form)
 
 
+@users.route("/change_password",methods=['GET'])
+@login_required
+def change_password():
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        hashed_pswd = str_hash(form.password.data)
+        user.password = hashed_pswd
+        db.session.commit()
+        flash('Your password has been updated! You are now able to log in', 'success')
+        return redirect(url_for('users.login'))
+    return render_template('reset_password.html', title='Reset Password', form=form)
+
 @users.route("/reset_password/<token>", methods=['GET', 'POST'])
 def reset_token(token):
     if current_user.is_authenticated:
@@ -120,4 +151,4 @@ def reset_token(token):
         db.session.commit()
         flash('Your password has been updated! You are now able to log in', 'success')
         return redirect(url_for('users.login'))
-    return render_template('reset_token.html', title='Reset Password', form=form)
+    return render_template('reset_password.html', title='Reset Password', form=form)
