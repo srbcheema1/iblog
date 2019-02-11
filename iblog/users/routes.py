@@ -125,7 +125,8 @@ def user_posts(username):
     posts = Post.query.filter_by(author=user)\
         .order_by(Post.date_posted.desc())\
         .paginate(page=page, per_page=3)
-    return render_template('user_posts.html', posts=posts, user=user,prefix=prefix)
+    image_file = url_for('static', filename='profile_pics/' + user.image_file)
+    return render_template('user_posts.html', posts=posts, writer=user, image_file=image_file, prefix=prefix)
 
 
 
