@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block content %}
+<form method="POST" action="" enctype="multipart/form-data">
+    <div class="form-group">
+        {{ form.hidden_tag() }}
+        {{ form.picture.label() }}
+        {{ form.picture(class="form-control-file") }}
+        {% if form.picture.errors %}
+            {% for error in form.picture.errors %}
+                <span class="text-danger">{{ error }}</span></br>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div class="form-group">
+        {{ form.submit(class="btn btn-outline-info") }}
+    </div>
+</form>
+{% endblock content %}

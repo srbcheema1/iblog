@@ -6,7 +6,8 @@ from flask_dance.contrib.google import google
 
 from iblog.config import db
 from iblog.models import User, Post
-from iblog.users.forms import RegistrationForm, LoginForm, UpdateAccountForm, SetupForm
+from iblog.users.forms import RegistrationForm, LoginForm, UpdateAccountForm
+from iblog.users.forms import SetupForm, UpdatePasswordForm, UpdateDpForm
 from iblog.users.forms import RequestResetForm, ResetPasswordForm
 from iblog.users.utils import save_picture, send_reset_email, save_picture_url, get_unique_username
 from iblog.utils import prefix
@@ -57,14 +58,17 @@ def google_login():
 def setup():
     form = SetupForm()
     if form.validate_on_submit():
+        print(form.picture.data)
         if form.picture.data:
+            print('got picture')
             picture_file = save_picture(form.picture.data)
             current_user.image_file = picture_file
+        else: print('got no pic')
         current_user.username = form.username.data
         current_user.password = str_hash(form.password.data)
         db.session.commit()
         flash('Welcome to iBlog', 'success')
-        return redirect(url_for('main.home'))
+        return redirect(url_for('users.account'))
     form.username.data = current_user.username
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
     return render_template('setup.html', title='Account Setup', image_file=image_file, form=form)
@@ -102,20 +106,27 @@ def logout():
 @login_required
 def account():
     form = UpdateAccountForm()
+    pform = UpdatePasswordForm()
+    dform = UpdateDpForm()
     if form.validate_on_submit():
-        if form.picture.data:
-            picture_file = save_picture(form.picture.data)
-            current_user.image_file = picture_file
         current_user.username = form.username.data
-        current_user.email = form.email.data
+    if pform.validate_on_submit():
+        current_user.password = str_hash(pform.new_password.data)
+    if dform.validate_on_submit():
+        if dform.picture.data:
+            picture_file = save_picture(dform.picture.data)
+            current_user.image_file = picture_file
+
+    if form.validate_on_submit() or pform.validate_on_submit() or dform.validate_on_submit():
         db.session.commit()
         flash('Your account has been updated!', 'success')
         return redirect(url_for('users.account'))
-    elif request.method == 'GET':
+    if request.method == 'GET':
         form.username.data = current_user.username
-        form.email.data = current_user.email
+        form.full_name.data = ''
+        form.about.data = 'Hi There! happy iBlogging :)'
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
-    return render_template('account.html', title='Account', image_file=image_file, form=form)
+    return render_template('account.html', title='Account', image_file=image_file, form=form, pform = pform, dform=dform)
 
 
 @users.route("/user/<string:username>")
