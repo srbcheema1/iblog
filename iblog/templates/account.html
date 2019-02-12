@@ -79,7 +79,14 @@
     <form class="update-dp" method="POST" action="" enctype="multipart/form-data" style="display:none;">
         {{ dform.hidden_tag() }}
         <fieldset class="form-group">
-            <legend class="border-bottom mb-4">Upload Profile Pic</legend>
+            <legend class="border-bottom mb-4">
+              <div style="display:flex; justify-content:space-between;">
+                Upload Profile Pic
+                <div>
+                  <i class="fas fa-arrow-alt-circle-up" onclick="updateDp()" style="font-size:24px; color:#17a2b8;"></i>
+                </div>
+              </div>
+            </legend>
             <div class="form-group">
                 <!--{{ dform.picture.label() }}-->
                 {{ dform.picture(class="form-control-file") }}
@@ -115,7 +122,15 @@
     <form class="update-password" method="POST" action="" enctype="multipart/form-data" style="display:none;">
         {{ pform.hidden_tag() }}
         <fieldset class="form-group">
-            <legend class="border-bottom mb-4">Update Password</legend>
+            <legend class="border-bottom mb-4">
+              <div style="display:flex; justify-content:space-between;">
+                Upload Password
+                <div>
+                  <i class="fas fa-arrow-alt-circle-up" onclick="updatePassword()" style="font-size:24px; color:#1aa5bb;">
+                  </i>
+                </div>
+              </div>
+            </legend>
             <div class="form-group update-password" style="display:none;">
                 {{ pform.new_password.label(class="form-control-label") }}
                 {% if pform.new_password.errors %}
