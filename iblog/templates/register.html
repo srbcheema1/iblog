@@ -64,6 +64,13 @@
             </div>
         </form>
     </div>
+    <div class="content-section">
+      <a class="btn btn-block" href={{url_for('users.google_login')}}>
+        <button class="btn btn-outline-info" type=button>
+          <span class="fab fa-google" style="letter-spacing: 5px;"></span> Sign up with Google
+        </button>
+      </a>
+    </div>
     <div class="border-top pt-3">
         <small class="text-muted">
             Already Have An Account? <a class="ml-2" href="{{ url_for('users.login') }}">Sign In</a>
