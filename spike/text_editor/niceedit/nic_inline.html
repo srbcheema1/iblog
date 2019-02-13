@@ -1,0 +1,18 @@
+<div id="sample">
+  <script type="text/javascript" src="http://js.nicedit.com/nicEdit-latest.js"></script> <script type="text/javascript">
+     bkLib.onDomLoaded(function() {
+          var myNicEditor = new nicEditor();
+          myNicEditor.setPanel('myNicPanel');
+          myNicEditor.addInstance('myInstance1');
+          myNicEditor.addInstance('myInstance3');
+     });
+  </script>
+  <div id="myNicPanel" style=""></div>
+  <textarea id="myInstance1" style="font-size: 16px; background-color: #ccc; padding: 3px; border: 5px solid #000; width: 400px;">
+    Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Sed magna dolor, faucibus ac, iaculis non, cursus et, dui. Donec non urna. Aliquam volutpat ornare augue. Phasellus egestas, nisl
+  </textarea>
+  <h4> Inline Paragraph </h4>
+  <p id="myInstance3" style="border: 1px solid #000;">
+    This is some text that can be edited in the inline paragraph editor.
+  </p>
+</div>
