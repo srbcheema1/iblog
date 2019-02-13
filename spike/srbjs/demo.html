@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <button onclick="srbToggleDisplay()">Preview toggle</button>
+    <textarea class="srb-toggle-display" style="display:block;"rows="6" cols="60">Insert proxied **Markdown** here.</textarea>
+    <div class="srb-toggle-display" style="display:none;"> hello </div>
+    <script>
+      function srbToggleDisplay() {
+        var list = document.getElementsByClassName("srb-toggle-display");
+        for (var i = 0; i < list.length; i++) {
+          if (list[i].style.display === "none") {
+            list[i].style.display = "block";
+          } else {
+            list[i].style.display = "none";
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
+

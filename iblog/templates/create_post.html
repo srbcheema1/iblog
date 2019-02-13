@@ -28,7 +28,7 @@
                         {% endfor %}
                     </div>
                 {% else %}
-                    {{ form.content(class="form-control form-control-lg") }}
+                    {{ form.content(class="form-control form-control-lg", id="srb-editor") }}
                 {% endif %}
             </div>
         </fieldset>
@@ -37,4 +37,20 @@
         </div>
     </form>
 </div>
+<script type="text/javascript" src="{{ url_for('static', filename='tinymce/tinymce.min.js') }}"></script>
+<script>
+  tinymce.init({
+    selector: "#srb-editor",
+    plugins: [
+      'advlist autolink lists link image charmap preview hr anchor pagebreak',
+      'searchreplace wordcount visualblocks visualchars fullscreen autoresize',
+      'insertdatetime print nonbreaking save table contextmenu directionality',
+      'emoticons template paste textcolor colorpicker textpattern imagetools toc'
+    ],
+    toolbar1: 'styleselect | alignleft aligncenter alignright alignjustify | bullist numlist | forecolor backcolor',
+    toolbar2: 'preview | undo redo | bold italic underline | outdent indent | emoticons link image',
+    toolbar_items_size: 'small',
+    plugin_preview_width: 380
+  });
+</script>
 {% endblock content %}
