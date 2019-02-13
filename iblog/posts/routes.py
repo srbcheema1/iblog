@@ -4,6 +4,7 @@ from flask_login import current_user, login_required
 from iblog.config import db
 from iblog.models import Post
 from iblog.posts.forms import PostForm
+from iblog.const import domain_url
 
 posts = Blueprint('posts', __name__)
 
@@ -25,7 +26,8 @@ def new_post():
 @posts.route("/post/<int:post_id>")
 def post(post_id):
     post = Post.query.get_or_404(post_id)
-    return render_template('post.html', title=post.title, post=post)
+    srb_url = domain_url + url_for('posts.post',post_id=post.id)
+    return render_template('post.html', title=post.title, post=post, srb_url=srb_url)
 
 
 @posts.route("/post/<int:post_id>/update", methods=['GET', 'POST'])
